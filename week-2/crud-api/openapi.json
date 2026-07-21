@@ -38,7 +38,7 @@
                 "summary" : "Get All Tasks",
                 "responses" : {
                     "200" : {
-                        "description" : "Success"
+                        "description" : "Returns All Tasks"
                     }
                 }
             },
@@ -65,7 +65,7 @@
 
                 "responses" : {
                     "201" : {
-                        "description" : "Task Created Successfully"
+                        "description" : "Task Created"
                     },
                     "400" : {
                         "description" : "Title is required"
@@ -76,7 +76,7 @@
 
         "/tasks/{id}" : {
             "get" : {
-                "summary" : "Find Task by ID",
+                "summary" : "Get Task by ID",
                 "parameters" : [
                     {
                         "name" : "id",
@@ -91,7 +91,7 @@
 
                 "responses" : {
                     "200" : {
-                        "description" : "Success"
+                        "description" : "Returns a single task"
                     },
                     "404" : {
                         "description" : "Task ID not found"
@@ -128,8 +128,7 @@
                                         "type" : "boolean",
                                         "example" : false
                                     }
-                                },
-                                "required" : ["title"]
+                                }
                             }
                         }
                     }
