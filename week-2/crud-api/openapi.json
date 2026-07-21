@@ -1,0 +1,176 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "CRUD API",
+        "version": "1.0.0",
+        "description": "Simple CRUD API" 
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
+    "paths": {
+        "/" : {
+            "get" : {
+                "summary" : "Get API Information",
+                "responses" : {
+                    "200" : {
+                        "description" : "Success"
+                    }
+                }
+            }
+        },
+
+        "/health" : {
+            "get" : {
+                "summary" : "Health Check",
+                "responses" : {
+                    "200" : {
+                        "description" : "Health Check Ok"
+                    }
+                }
+            }
+        },
+
+        "/tasks" : {
+            "get" : {
+                "summary" : "Get All Tasks",
+                "responses" : {
+                    "200" : {
+                        "description" : "Success"
+                    }
+                }
+            },
+
+            "post" : {
+                "summary" : "Create a New Task",
+                "requestBody" : {
+                    "required" : true,
+                    "content" : {
+                        "application/json" : {
+                            "schema" : {
+                                "type" : "object",
+                                "properties" : {
+                                    "title" : {
+                                        "type" : "string",
+                                        "example" : "Buy Groceries"
+                                    }
+                                },
+                                "required" : ["title"]
+                            }
+                        }
+                    }
+                },
+
+                "responses" : {
+                    "201" : {
+                        "description" : "Task Created Successfully"
+                    },
+                    "400" : {
+                        "description" : "Title is required"
+                    }
+                }
+            }
+        },
+
+        "/tasks/{id}" : {
+            "get" : {
+                "summary" : "Find Task by ID",
+                "parameters" : [
+                    {
+                        "name" : "id",
+                        "in" : "path",
+                        "required" : true,
+                        "description" : "ID of the task to retrieve",
+                        "schema" : {
+                            "type" : "integer"
+                        }
+                    }
+                ],
+
+                "responses" : {
+                    "200" : {
+                        "description" : "Success"
+                    },
+                    "404" : {
+                        "description" : "Task ID not found"
+                    }
+                }
+            },
+
+            "put" : {
+                "summary" : "Update a Task",
+                "parameters" : [
+                    {
+                        "name" : "id",
+                        "in" : "path",
+                        "required" : true,
+                        "description" : "ID of the task to update",
+                        "schema" : {
+                            "type" : "integer"
+                        }
+                    }
+                ],
+
+                "requestBody" : {
+                    "required" : true,
+                    "content" : {
+                        "application/json" : {
+                            "schema" : {
+                                "type" : "object",
+                                "properties" : {
+                                    "title" : {
+                                        "type" : "string",
+                                        "example" : "Buy Groceries"
+                                    },
+                                    "done" : {
+                                        "type" : "boolean",
+                                        "example" : false
+                                    }
+                                },
+                                "required" : ["title"]
+                            }
+                        }
+                    }
+                },
+
+                "responses" : {
+                    "200" : {
+                        "description" : "Task Updated Successfully"
+                    },
+                    "404" : {
+                        "description" : "Task ID not found"
+                    },
+                    "400" : {
+                        "description" : "Invalid/empty body"
+                    }
+                }
+            },
+
+            "delete" : {
+                "summary" : "Delete a Task",
+                "parameters" : [
+                    {
+                        "name" : "id",
+                        "in" : "path",
+                        "required" : true,
+                        "description" : "ID of the task to delete",
+                        "schema" : {
+                            "type" : "integer"
+                        }
+                    }
+                ],
+
+                "responses" : {
+                    "204" : {
+                        "description" : "Task Deleted Successfully"
+                    },
+                    "404" : {
+                        "description" : "Task ID not found"
+                    }
+                }
+            }
+        }
+    }
+}    
