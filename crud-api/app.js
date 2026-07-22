@@ -1,34 +1,64 @@
 const express = require("express");
 const app = express();
 const PORT = 3000;
+app.use(express.json());
+
 const swaggerUi = require("swagger-ui-express");
 const openApiDocument = require("./openapi.json");
-
 app.use(
     "/docs",
     swaggerUi.serve,
     swaggerUi.setup(openApiDocument)
 );
 
-app.use(express.json());
+const Database = require('better-sqlite3');
+const db = new Database('tasks.db', { verbose: console.log });
+const createTableSQL = `
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    done BOOLEAN NOT NULL DEFAULT 0
+    );`
 
-let tasks = [
-    {
-        id: 1,
-        title: "Learn Backend",
-        done: true
-    },
-    {
-        id: 2,
-        title: "Build CRUD API",
-        done: false
-    },
-    {
-        id: 3,
-        title: "Deploy API",
-        done: false
+try {
+    db.exec(createTableSQL);
+    console.log("Table created successfully");
+} catch (error) {
+    console.error("Error creating table:", error.message);
+}
+
+const countTasksSQL = db.prepare("SELECT COUNT(*) AS count FROM tasks");
+const insertTaskSQL = db.prepare("INSERT INTO tasks (title, done) VALUES (@title, @done)");
+
+const sampleTasks = [
+        {
+            title: "Learn Backend",
+            done: 1
+        },
+        {
+            title: "Build CRUD API",
+            done: 0
+        },
+        {
+            title: "Deploy API",
+            done: 0
+        }
+    ];
+
+if (countTasksSQL.get().count === 0) {
+    const insertSampleTask = db.transaction((tasks) => {
+        for (const task of tasks) insertTaskSQL.run(task);
+    });
+
+    try {
+        insertSampleTask(sampleTasks);
+        console.log("Example tasks inserted successfully");
+    } catch (error) {
+        console.error("Error inserting example tasks:", error.message);
     }
-]
+}
+
+
 
 app.get("/", (req, res) => {
     res.json({
