@@ -56,7 +56,7 @@ if (countTasksSQL.get().count === 0) {
     } catch (error) {
         console.error("Error inserting example tasks:", error.message);
     }
-}
+};
 
 
 
@@ -72,12 +72,12 @@ app.get("/health", (req, res) => {
     res.json({
         "status": "ok",
     })
-})
+});
 
 app.get("/tasks", (req, res) => {
     const tasks = db.prepare("SELECT * FROM tasks").all();
     res.json(tasks);
-})
+});
 
 app.get("/tasks/:id", (req, res) => {
     const id = parseInt(req.params.id);
@@ -89,7 +89,7 @@ app.get("/tasks/:id", (req, res) => {
         });
     }
     res.json(task);
-})
+});
 
 app.post("/tasks", (req, res) => {
     const { title } = req.body;
@@ -100,16 +100,20 @@ app.post("/tasks", (req, res) => {
         });
     }
 
-    const newId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
-    const newTask = {
-        id: newId,
-        title,
-        done: false
-    }
+    const insertNewTaskSQL = db.prepare("INSERT INTO tasks (title, done) VALUES (@title, 0)");
 
-    tasks.push(newTask);
-    return res.status(201).json(newTask);
-})
+    try {
+        const info = insertNewTaskSQL.run({ title });
+        const newTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(info.lastInsertRowid);
+
+        return res.status(201).json(newTask);
+    } catch (error) {
+        console.error("Detail Error SQLite:", error);
+        return res.status(500).json({
+            error: "Error inserting new task"
+        });
+    }
+});
 
 app.put("/tasks/:id", (req, res) => {
     const id = parseInt(req.params.id);
