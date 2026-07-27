@@ -119,7 +119,7 @@ app.put("/tasks/:id", (req, res) => {
     const id = parseInt(req.params.id);
     const { title, done } = req.body;
 
-    const task = tasks.find(task => task.id === id);
+    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
 
     if (!task) {
         return res.status(404).json({
@@ -147,26 +147,33 @@ app.put("/tasks/:id", (req, res) => {
         });
     }
 
-    task.title = title ?? task.title;
-    task.done = done ?? task.done;
+    const updateTaskSQL = db.prepare("UPDATE tasks SET title = @title, done = @done WHERE id = @id");
+    updateTaskSQL.run({
+        id,
+        title: title ?? task.title,
+        done: done ?? task.done
+    });
 
-    return res.status(200).json(task);
-})
+    const updatedTask = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+    return res.status(200).json(updatedTask);
+});
 
 app.delete("/tasks/:id", (req, res) => {
     const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(task => task.id === id);
 
-    if (taskIndex === -1) {
+    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+
+    if (!task) {
         return res.status(404).json({
             error: `Task ${id} not found`,
         });
     }
 
-    tasks.splice(taskIndex, 1);
+    db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
 
-    return res.status(204).send("No Content");
-})
+    return res.status(204).end();
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
