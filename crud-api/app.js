@@ -1,5 +1,15 @@
+require('dotenv').config();
+
 const express = require("express");
+const { createClient } = require("@supabase/supabase-js");
+
 const app = express();
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
+
 const PORT = 3000;
 app.use(express.json());
 
@@ -12,7 +22,7 @@ app.use(
 );
 
 const Database = require('better-sqlite3');
-const db = new Database('tasks.db', { verbose: console.log });
+const db = new Database('tasks.db');
 const createTableSQL = `
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
